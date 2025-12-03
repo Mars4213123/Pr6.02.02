@@ -22,7 +22,7 @@ namespace RegIN_Kantuganov.Classes
             }
         }
 
-        public static MySqlDataReader Query(string SQL, out MySqlConnection connection)
+        public static MySqlDataReader Query(string SQL, MySqlConnection connection)
         {
             connection = OpenConnection();
             MySqlCommand command = new MySqlCommand(SQL, connection);

@@ -24,7 +24,13 @@ namespace RegIN_Kantuganov
         public MainWindow()
         {
             InitializeComponent();
-            SendMail.SendMessage("Привет как дела?", "kantuganovmarsel@yandex.ru");
+
+            User user = new User();
+            user.HandlerInCorrectLogin += InCorrectLogin;
+
+        }
+        public void InCorrectLogin() {
+
         }
     }
 }
