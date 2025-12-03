@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -21,16 +22,34 @@ namespace RegIN_Kantuganov
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static MainWindow mainWindow;
         public MainWindow()
         {
             InitializeComponent();
-
-            User user = new User();
-            user.HandlerInCorrectLogin += InCorrectLogin;
-
+            mainWindow = this;
+            OpenPage(new Pages.Login());
         }
-        public void InCorrectLogin() {
 
+        public void OpenPage(Page page)
+        {
+            DoubleAnimation StartAnimation = new DoubleAnimation()
+            {
+                From = 1,
+                To = 0,
+                Duration = TimeSpan.FromSeconds(0.6)
+            };
+            StartAnimation.Completed += delegate
+            {
+                frame.Navigate(page);
+                DoubleAnimation EndAnimation = new DoubleAnimation()
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.6)
+                };
+                frame.BeginAnimation(Frame.OpacityProperty, EndAnimation);
+            };
+            frame.BeginAnimation(Frame.OpacityProperty, StartAnimation);
         }
     }
 }
