@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using RegIN_Kantuganov.Classes;
 
 namespace RegIN_Kantuganov
 {
@@ -23,6 +24,7 @@ namespace RegIN_Kantuganov
         public MainWindow()
         {
             InitializeComponent();
+            SendMail.SendMessage("Привет как дела?", "kantuganovmarsel@yandex.ru");
         }
     }
 }

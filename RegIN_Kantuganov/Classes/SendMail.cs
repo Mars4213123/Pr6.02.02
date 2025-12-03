@@ -7,13 +7,13 @@ namespace RegIN_Kantuganov.Classes
     public class SendMail
     {
         public static void SendMessage(string message, string to) {
-            var SmtpClient = new SmtpClient()
+            var SmtpClient = new SmtpClient("smtp.yandex.ru")
             {
                 Port = 587,
-                Credentials = new NetworkCredential(),
-                EnableSsl = true
+                Credentials = new NetworkCredential("kantuganovmarsel@yandex.ru", "ddcokcfoqaoeuwwl"),
+                EnableSsl = true,
             };
-            SmtpClient.Send("landaxer@yandex.ru", to, "Проект RegIN", message);
+            SmtpClient.Send("kantuganovmarsel@yandex.ru", to, "Проект RegIN", message);
         }
     }
 }
