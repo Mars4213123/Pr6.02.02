@@ -6,8 +6,9 @@
       xmlns:local="clr-namespace:RegIN_Kantuganov.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+      xmlns:uc="clr-namespace:RegIN_Kantuganov.Elements"
       Title="Recovery"
-      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:uc="clr-namespace:RegIN_Kantuganov.Elements"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       TextElement.Foreground="{DynamicResource MaterialDesignBody}"
       TextElement.FontWeight="Regular"
       TextElement.FontSize="13"
@@ -37,7 +38,7 @@
                     RadiusY="50"
                     Center="50, 50"/>
                     </Image.Clip>
-                </Image>
+            </Image>
             <Label
                 x:Name="UNameUser"
                 Margin="10,137,10,0"
@@ -57,14 +58,14 @@
                 VerticalAlignment="Top"
                 KeyUp="SetLogin"
                 LostFocus="SetLogin"/>
-            <uc:ElementCapture
-                x:Name="Capture"
-                HorizontalAlignment="Center"
-                Width="280"
-                Margin="10,213,10,0"
-                Height="100"
-                VerticalAlignment="Top"/>
-            <Label
+                <uc:ElementCapture
+                    x:Name="Capture"
+                    HorizontalAlignment="Center"
+                    Width="280"
+                    Margin="10, 213, 18, 0"
+                    Height="100"
+                    VerticalAlignment="Top"/>
+                <Label
                 Content="Back"
                 Margin="10,318,10,0"
                 VerticalAlignment="Top"
