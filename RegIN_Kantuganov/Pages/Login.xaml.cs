@@ -24,5 +24,30 @@ namespace RegIN_Kantuganov.Pages
         {
             InitializeComponent();
         }
+
+        private void SetLogin(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void SetPassword(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void SetLogin(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RecoveryPassword(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void OpenBegin(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }
