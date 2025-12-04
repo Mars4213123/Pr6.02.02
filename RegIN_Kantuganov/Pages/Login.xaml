@@ -29,7 +29,7 @@
                        Height="100"
                        Margin="32"
                         VerticalAlignment="Top"
-                       Width="100" Source="Images/ic_user.png">
+                       Width="100" Source="Images/ic-user.png">
                     <Image.Clip>
                         <EllipseGeometry
                             RadiusX="50"
