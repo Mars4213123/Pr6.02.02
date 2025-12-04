@@ -23,6 +23,7 @@ namespace RegIN_Kantuganov
     public partial class MainWindow : Window
     {
         public static MainWindow mainWindow;
+        public User UserLogIn = new User();
         public MainWindow()
         {
             InitializeComponent();

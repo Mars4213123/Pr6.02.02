@@ -89,7 +89,7 @@
                     VerticalAlignment="Top"
                     Foreground="#FF673AB7"
                     FontSize="10"
-                    MouseDown="OpenBegin"
+                    MouseDown="OpenRegin"
                     HorizontalAlignment="Right"
                     Width="62"/>
             </Grid>
