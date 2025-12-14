@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using MySql.Data.MySqlClient;
 
 namespace RegIN_Kantuganov.Classes
@@ -10,139 +11,158 @@ namespace RegIN_Kantuganov.Classes
     public class User
     {
         public int Id { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
-        public string Name { get; set; }
-        public byte[] Image { get; set; }
+        public string Login { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string Name { get; set; } = "";
+        public byte[] Image = new byte[0];
+        public string Pincode { get; set; } = "";
         public DateTime DateUpdate { get; set; }
         public DateTime DateCreate { get; set; }
-
         public CorrectLogin HandlerCorrectLogin;
         public InCorrectLogin HandlerInCorrectLogin;
-
         public delegate void CorrectLogin();
         public delegate void InCorrectLogin();
 
-        public void GetUserLogin(string login)
+        public bool HasPin => !string.IsNullOrEmpty(Pincode);
+
+        public void GetUserLogin(string Login)
         {
             this.Id = -1;
             this.Login = String.Empty;
             this.Password = String.Empty;
             this.Name = String.Empty;
             this.Image = new byte[0];
+            this.Pincode = String.Empty;
+            MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
 
-            MySqlConnection connection = WorkingDB.OpenConnection();
-            if (WorkingDB.OpenConnection(connection))
+            if (WorkingDB.OpenConnection(mySqlConnection))
             {
-                MySqlDataReader userData = WorkingDB.Query(
-                    $"SELECT * FROM `users` WHERE `Login` = {Login}", connection);
+                MySqlDataReader userQuery = WorkingDB.Query($"SELECT * FROM `users` WHERE `Login` = '{Login}'", mySqlConnection);
 
-                if (userData.HasRows)
+                if (userQuery.HasRows)
                 {
-                    userData.Read();
-                    this.Id = userData.GetInt32(0);
-                    this.Login = userData.GetString(1);
-                    this.Password = userData.GetString(2);
-                    this.Name = userData.GetString(3);
-                    if (userData.IsDBNull(4) == false)
+                    userQuery.Read();
+                    this.Id = userQuery.GetInt32(0);
+                    this.Login = userQuery.GetString(1);
+                    this.Password = userQuery.GetString(2);
+                    this.Name = userQuery.GetString(3);
+
+                    if (!userQuery.IsDBNull(4))
                     {
                         this.Image = new byte[64 * 1024];
-                        userData.GetBytes(4, 0, Image, 0, Image.Length);
+                        userQuery.GetBytes(4, 0, Image, 0, Image.Length);
                     }
-                    this.DateUpdate = userData.GetDateTime(5);
-                    this.DateCreate = userData.GetDateTime(6);
 
-                    HandlerCorrectLogin.Invoke();
+                    try
+                    {
+                        if (!userQuery.IsDBNull(7))
+                        {
+                            string pinValue = userQuery.GetString(7);
+                            this.Pincode = pinValue ?? "";
+                        }
+                    }
+                    catch
+                    {
+                        this.Pincode = "";
+                    }
+
+                    this.DateUpdate = userQuery.GetDateTime(5);
+                    this.DateCreate = userQuery.GetDateTime(6);
+
+                    HandlerCorrectLogin?.Invoke();
                 }
-                else HandlerInCorrectLogin.Invoke();
-            }
-            else HandlerInCorrectLogin.Invoke();
-            WorkingDB.CloseConnection(connection);
-        }
-
-        public void Save() {
-            MySqlConnection connection = WorkingDB.OpenConnection();
-            if (WorkingDB.OpenConnection(connection))
-            {
-                MySqlCommand command = new MySqlCommand(
-                    "INSERT INTO " +
-                    "'users'(" +
-                    "'Login', " +
-                    "'Password', " +
-                    "'Name', " +
-                    "'Image', " +
-                    "'DateUpdate', " +
-                    "'DateCreate')" +
-                    "VALUES (" +
-                    "@Login, " +
-                    "@Password, " +
-                    "@Name, " +
-                    "@Image, " +
-                    "@DateUpdate, " +
-                    "@DateCreate)", connection);
-                command.Parameters.AddWithValue("@Login", this.Login);
-                command.Parameters.AddWithValue("@Password", this.Password);
-                command.Parameters.AddWithValue("@Name", this.Name);
-                command.Parameters.AddWithValue("@Image", this.Image);
-                command.Parameters.AddWithValue("@DateUpdate", this.DateUpdate);
-                command.Parameters.AddWithValue("@DateCreate", this.DateCreate);
-
-                command.ExecuteNonQuery();
-            }
-
-            WorkingDB.CloseConnection(connection);
-        }
-
-        public void CreateNewPassword()
-        {
-            if (this.Login != String.Empty)
-            {
-                this.Password = CreatePassword();
-
-                MySqlConnection connection = WorkingDB.OpenConnection();
-                if (WorkingDB.OpenConnection(connection))
+                else
                 {
-                    WorkingDB.Query(
-                        $"UPDATE " +
-                        $"`users` " +
-                        $"FROM " +
-                        $"`Password`='{this.Password}` " +
-                        $"WHERE " +
-                        $"`Login`={this.Login};", connection);
+                    HandlerInCorrectLogin?.Invoke();
                 }
+            }
+            else
+            {
+                HandlerInCorrectLogin?.Invoke();
+            }
 
-                WorkingDB.CloseConnection(connection);
-                SendMail.SendMessage($"Your account password has been changed.\nNew password: {Password}", this.Login);
+            WorkingDB.CloseConnection(mySqlConnection);
+        }
+
+        public void SetUser()
+        {
+            MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
+            if (WorkingDB.OpenConnection(mySqlConnection))
+            {
+                MySqlCommand mySqlCommand = new MySqlCommand("INSERT INTO `users`(`Login`, `Password`, `Name`, `Image`, `DateUpdate`, `DateCreate`) VALUES (@Login, @Password, @Name, @Image, @DateUpdate, @DateCreate)", mySqlConnection);
+                mySqlCommand.Parameters.AddWithValue("@Login", this.Login);
+                mySqlCommand.Parameters.AddWithValue("@Password", this.Password);
+                mySqlCommand.Parameters.AddWithValue("@Name", this.Name);
+                mySqlCommand.Parameters.AddWithValue("@Image", this.Image);
+                mySqlCommand.Parameters.AddWithValue("@DateUpdate", this.DateUpdate);
+                mySqlCommand.Parameters.AddWithValue("@DateCreate", this.DateCreate);
+                mySqlCommand.ExecuteNonQuery();
+            }
+            WorkingDB.CloseConnection(mySqlConnection);
+        }
+        public void SetPin(string pin)
+        {
+            if (string.IsNullOrEmpty(pin))
+            {
+                MessageBox.Show("PIN не может быть пустым");
+                return;
+            }
+
+            MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
+
+            if (WorkingDB.OpenConnection(mySqlConnection))
+            {
+                WorkingDB.Query($"UPDATE `users` SET `Pincode` = '{pin}' WHERE `Login` = '{this.Login}'", mySqlConnection);
+            }
+            WorkingDB.CloseConnection(mySqlConnection);
+
+            this.Pincode = pin;
+
+            SendMail.SendMessage($"PIN code has been set for your account: {pin}", this.Login);
+        }
+        public void CrateNewPassword()
+        {
+            if (Login != String.Empty)
+            {
+                Password = GeneratePass();
+                MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
+                if (WorkingDB.OpenConnection(mySqlConnection))
+                {
+                    WorkingDB.Query($"UPDATE `users` SET `Password`='{this.Password}' WHERE `Login` = '{this.Login}'", mySqlConnection);
+                }
+                WorkingDB.CloseConnection(mySqlConnection);
+                SendMail.SendMessage($"Your account password has been changed.\nNew password: {this.Password}", this.Login);
             }
         }
 
-        private string CreatePassword()
+        public string GeneratePass()
         {
             List<char> NewPassword = new List<char>();
-            Random random = new Random();
-            char[] ArrNumbers = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
-            char[] ArrSymbols = { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' };
-            char[] ArrLowercase = {'q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m' };
-            NewPassword.Add(ArrNumbers[random.Next(0, ArrNumbers.Length)]);
-            NewPassword.Add(ArrSymbols[random.Next(0, ArrSymbols.Length)]);
+            Random rnd = new Random();
+            char[] ArrNumbers = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            char[] ArrSymbols = { '|', '-', '_', '!', '@', '#', '$', '%', '&', '*', '=', '+' };
+            char[] ArrUppercase = { 'q', 'w', 'e', 'r', 't', 's', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm' };
 
-            for (var i = 0; i < 2; i++)
-                NewPassword.Add(char.ToUpper(ArrLowercase[random.Next(0, ArrLowercase.Length)]));
-            for (var i = 0; i < 6; i++)
-                NewPassword.Add(ArrLowercase[random.Next(0, ArrLowercase.Length)]);
+            for (int i = 0; i < 1; i++)
+            NewPassword.Add(ArrNumbers[rnd.Next(0, ArrNumbers.Length)]);
+            for (int i = 0; i < 1; i++)
+            NewPassword.Add(ArrSymbols[rnd.Next(0, ArrSymbols.Length)]);
+            for (int i = 0; i < 2; i++)
+            NewPassword.Add(char.ToUpper(ArrUppercase[rnd.Next(0, ArrUppercase.Length)]));
+            for (int i = 0; i < 6; i++)
+            NewPassword.Add(ArrUppercase[rnd.Next(0, ArrUppercase.Length)]);
 
-            for (var i = 0; i < NewPassword.Count; i++)
+            for (int i = 0; i < NewPassword.Count; i++)
             {
-                int RandomSymbol = random.Next(0, NewPassword.Count);
+                int RandomSymbol = rnd.Next(0, NewPassword.Count);
                 char Symbol = NewPassword[RandomSymbol];
                 NewPassword[RandomSymbol] = NewPassword[i];
                 NewPassword[i] = Symbol;
             }
-
             string NPassword = "";
-            for (var i = 0; i < NewPassword.Count; i++)
+            
+            for (int i = 0; i < NewPassword.Count; i++)
                 NPassword += NewPassword[i];
-
             return NPassword;
         }
     }

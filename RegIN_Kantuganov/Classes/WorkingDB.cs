@@ -6,7 +6,7 @@ namespace RegIN_Kantuganov.Classes
 {
     public class WorkingDB
     {
-        readonly static string config = "server=127.0.0.1;uid=root;pwd=;database=regin";
+        readonly static string config = "server=MySQL-8.2;uid=root;pwd=;database=regin";
 
         public static MySqlConnection OpenConnection() {
 

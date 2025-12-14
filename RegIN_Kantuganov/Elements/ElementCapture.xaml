@@ -3,25 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:RegIN_Kantuganov.Elements"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="200">
+             d:DesignWidth="280"
+             d:DesignHeight="100">
     <Grid>
-        <Grid
-    x:Name="Capture"
-    Height="50"
-    VerticalAlignment="Top"/>
-        <Label
-    Content="Enter capture:"
-    Margin="0,50,0,0"
-    VerticalAlignment="Top"/>
-        <TextBox
-    x:Name="InputCapture"
-    HorizontalContentAlignment="Center"
-    VerticalContentAlignment="Center"
-    Height="25"
-    VerticalAlignment="Top"
-    Margin="0,75,0,0"
-    KeyUp="EnterCapture"/>
+        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4"
+                Width="280" Height="50" VerticalAlignment="Top"
+                Background="LightYellow">
+            <Grid x:Name="Capture"/>
+        </Border>
+
+        <Label Content="Enter 4-digit code below:"
+               Margin="0,55,0,0" VerticalAlignment="Top"
+               FontSize="11" Foreground="Gray"/>
+
+        <Border BorderBrush="#FF673AB7" BorderThickness="1" CornerRadius="4"
+                Margin="0,75,0,0" VerticalAlignment="Top" Height="28">
+            <TextBox x:Name="InputCapture"
+                     BorderThickness="0"
+                     HorizontalContentAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     Background="Transparent"
+                     KeyUp="EnterCapture"/>
+        </Border>
     </Grid>
 </UserControl>
